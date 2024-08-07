@@ -26,7 +26,7 @@ class Auth:
             # Normalize excluded_path to ensure it ends with a slash
             if not excluded_path.endswith('/'):
                 excluded_path += '/'
-            
+
             # Use fnmatch to handle wildcard matching
             if fnmatch.fnmatch(path, excluded_path):
                 return False
