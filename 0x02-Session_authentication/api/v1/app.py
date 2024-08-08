@@ -3,9 +3,9 @@
 Route module for the API
 """
 from os import getenv
-from api.v1.views import app_views
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
+from api.v1.views import app_views
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
@@ -13,9 +13,8 @@ CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 # Create a variable auth initialized to None
 auth = None
+auth_type = getenv("AUTH_TYPE")
 
-# Based on the environment variable AUTH_TYPE, load and assign the right instance of authentication to auth
-auth_type = getenv("AUTH_TYPE", None)
 if auth_type == "basic_auth":
     from api.v1.auth.basic_auth import BasicAuth
     auth = BasicAuth()
@@ -26,7 +25,9 @@ else:
 @app.errorhandler(401)
 def unauthorized(error) -> str:
     """ Unauthorized handler """
-    return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({
+        "error": "Unauthorized"
+        }), 401
 
 @app.errorhandler(403)
 def forbidden(error) -> str:
@@ -40,7 +41,7 @@ def not_found(error) -> str:
 
 @app.before_request
 def before_request():
-    """ Method to handle before_request filter """
+    """ Method to filter each request """
     if auth is None:
         return
     excluded_paths = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
@@ -51,7 +52,6 @@ def before_request():
     if auth.current_user(request) is None:
         abort(403)
     request.current_user = auth.current_user(request)
-
 
 if __name__ == "__main__":
     host = getenv("API_HOST", "0.0.0.0")
