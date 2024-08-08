@@ -42,3 +42,4 @@ class SessionDBAuth(SessionExpAuth):
         session = sessions[0]
         session.remove()
         return True
+    
