@@ -57,3 +57,12 @@ class User(Base):
             return "{}".format(self.last_name)
         else:
             return "{} {}".format(self.first_name, self.last_name)
+        
+    def to_json(self):
+        """ Returns a dictionary representation of the User instance """
+        return {
+            'id': self.id,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name
+        }
