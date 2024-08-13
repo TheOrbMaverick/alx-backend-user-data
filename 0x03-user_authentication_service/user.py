@@ -15,9 +15,11 @@ class User(Base):
     Attributes:
         id (int): The integer primary key.
         email (str): A non-nullable string representing the user's email.
-        hashed_password (str): A non-nullable string representing the user's hashed password.
+        hashed_password (str): A non-nullable string representing
+        the user's hashed password.
         session_id (str): A nullable string representing the user's session ID.
-        reset_token (str): A nullable string representing the user's reset token.
+        reset_token (str): A nullable string representing
+        the user's reset token.
     """
     __tablename__ = "users"
 
