@@ -68,5 +68,37 @@ def logout():
     return redirect("/")
 
 
+@app.route("/profile", methods=["GET"])
+def profile():
+    """
+    GET /profile
+    Return user profile if session ID is valid.
+    """
+    session_id = request.cookies.get("session_id")
+    if not session_id:
+        abort(403)
+    
+    user = AUTH.get_user_from_session_id(session_id)
+    if not user:
+        abort(403)
+    
+    return jsonify({"email": user.email})
+
+
+@app.route('/reset_password', methods=['POST'])
+def get_reset_password_token():
+    """
+    Respond to the POST /reset_password route.
+    """
+    email = request.form.get('email')
+    if not email:
+        return jsonify({"message": "Email required"}), 400
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+        return jsonify({"email": email, "reset_token": reset_token}), 200
+    except ValueError:
+        return jsonify({"message": "Email not found"}), 403
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")
