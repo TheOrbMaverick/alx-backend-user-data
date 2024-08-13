@@ -26,7 +26,7 @@ class Auth:
         salt = bcrypt.gensalt()
         hash_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hash_password
-    
+
     def register_user(self, email: str, password: str) -> User:
         """
         Register a new user with email and password.
@@ -45,16 +45,17 @@ class Auth:
         """
         try:
             user = self._db.find_user_by(email=email)
-            return bcrypt.checkpw(password.encode('utf-8'), user.hashed_password.encode('utf-8'))
+            return bcrypt.checkpw(password.encode('utf-8'),
+                                  user.hashed_password.encode('utf-8'))
         except NoResultFound:
             return False
-        
+
     def _generate_uuid(self) -> str:
         """
         Generate a new UUID.
         """
         return str(uuid.uuid4())
-    
+
     def create_session(self, email: str) -> str:
         """
         Create a session ID for a user.
@@ -66,7 +67,7 @@ class Auth:
             return session_id
         except NoResultFound:
             return ""
-        
+
     def get_user_from_session_id(self, session_id: str) -> User:
         """
         Get a user from a session ID.
@@ -78,7 +79,7 @@ class Auth:
             return user
         except NoResultFound:
             return None
-        
+
     def destroy_session(self, user_id: int) -> None:
         """
         Destroy a user's session by setting their session ID to None.
@@ -99,7 +100,7 @@ class Auth:
             return reset_token
         except NoResultFound:
             raise ValueError("User not found")
-        
+
     def update_password(self, reset_token: str, password: str) -> None:
         """
         Update the user's password using the reset token.
@@ -107,6 +108,10 @@ class Auth:
         try:
             user = self._db.find_user_by(reset_token=reset_token)
             hashed_password = self._hash_password(password)
-            self._db.update_user(user.id, hashed_password=hashed_password, reset_token=None)
-        except:
+            self._db.update_user(
+                user.id,
+                hashed_password=hashed_password,
+                reset_token=None
+                )
+        except NoResultFound:
             raise ValueError("Invalid reset token")
