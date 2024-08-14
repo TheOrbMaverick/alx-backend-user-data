@@ -43,8 +43,9 @@ class DB:
             self._session.add(new_user)
             self._session.commit()
         except Exception as e:
-            print(f"Error adding user: {e}")
-            self.__session.rollback()
+            print(f"Error adding user to database: {e}")
+            self._session.rollback()
+            raise
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
