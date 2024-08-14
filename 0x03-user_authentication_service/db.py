@@ -42,7 +42,8 @@ class DB:
         try:
             self._session.add(new_user)
             self._session.commit()
-        except Exception:
+        except Exception as e:
+            print(f"Error adding user: {e}")
             self.__session.rollback()
         return new_user
 
