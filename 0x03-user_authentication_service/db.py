@@ -34,17 +34,16 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str, hashed_password: str) -> User:
-        """
-        Add a new user to the database.
-        """
-        new_user = User(email=email, hashed_password=hashed_password)
+    def _add_user(self, email: str, hashed_password: str) -> User:
+        """Add a new user to the database and return the User object."""
         try:
-            self._session.add(new_user)
+            user = User(email=email, hashed_password=hashed_password)
+            self._session.add(user)
             self._session.commit()
-        except Exception:
-            self.__session.rollback()
-        return new_user
+            return user
+        except Exception as e:
+            self._session.rollback()
+            raise e
 
     def find_user_by(self, **kwargs) -> User:
         """
