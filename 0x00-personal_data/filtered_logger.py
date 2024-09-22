@@ -5,7 +5,7 @@ filtered_logger module
 import re
 import logging
 from typing import List
-from os import environ
+import os
 import mysql.connector
 
 # PII_FIELDS constant
@@ -77,19 +77,51 @@ def get_logger() -> logging.Logger:
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
     """
-    Returns a MySQLConnection object for accessing Personal Data database
+    Connects to a secure MySQL database using credentials from
+    environment variables.
 
     Returns:
-        A MySQLConnection object using connection details from
-        environment variables
+        A MySQLConnection object to the database.
     """
-    username = environ.get("PERSONAL_DATA_DB_USERNAME", "root")
-    password = environ.get("PERSONAL_DATA_DB_PASSWORD", "")
-    host = environ.get("PERSONAL_DATA_DB_HOST", "localhost")
-    db_name = environ.get("PERSONAL_DATA_DB_NAME")
+    # Retrieve database credentials from environment variables
+    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    database = os.getenv("PERSONAL_DATA_DB_NAME")
 
-    cnx = mysql.connector.connection.MySQLConnection(user=username,
-                                                     password=password,
-                                                     host=host,
-                                                     database=db_name)
-    return cnx
+    # Connect to the MySQL database
+    return mysql.connector.connection.MySQLConnection(
+        user=username,
+        password=password,
+        host=host,
+        database=database
+    )
+
+
+def main() -> None:
+    """
+    Retrieves and logs information from the users table in the database.
+    Obfuscates PII fields in the output.
+    """
+    # Initialize logger
+    logger = get_logger()
+
+    # Obtain a database connection
+    db = get_db()
+    cursor = db.cursor()
+
+    # Query to fetch all data from the users table
+    query = "SELECT * FROM users;"
+    cursor.execute(query)
+
+    # Get column names from the query result
+    columns = [desc[0] for desc in cursor.description]
+
+    # Iterate over the result and log each row
+    for row in cursor:
+        message = "; ".join([f"{col}={val}" for col, val in zip(columns, row)])
+        logger.info(message)
+
+    # Close the cursor and connection
+    cursor.close()
+    db.close()
