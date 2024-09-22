@@ -61,6 +61,7 @@ class BasicAuth(Auth):
         """
         Method to return the User instance based on email and password
         """
+        # Check if the email and password are valid strings
         if user_email is None or not isinstance(user_email, str):
             return None
 
@@ -68,12 +69,16 @@ class BasicAuth(Auth):
             return None
 
         # Search for the user by email
-        user_list = User.search({'email': user_email})
+        try:
+            user_list = User.search({'email': user_email})
+        except Exception as e:
+            return None  # In case User.search raises an exception
 
-        # If no user found, return None
+        # If no user is found, return None
         if not user_list or len(user_list) == 0:
             return None
 
+        # Take the first user in the list
         user = user_list[0]
 
         # Validate the user's password
