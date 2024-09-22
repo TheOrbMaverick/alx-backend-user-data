@@ -53,7 +53,7 @@ def not_found(error) -> str:
 
 
 @app.before_request
-def before_request():
+def before_request() -> str:
     """ Method to filter each request """
     if auth is None:
         return
@@ -66,9 +66,11 @@ def before_request():
     if (auth.authorization_header(request) is None
             and auth.session_cookie(request) is None):
         abort(401)
-    request.current_user = auth.current_user(request)
-    if request.current_user is None:
+    current_user = auth.current_user(request)
+    if current_user is None:
         abort(403)
+
+    request.current_user = current_user
 
 
 if __name__ == "__main__":
