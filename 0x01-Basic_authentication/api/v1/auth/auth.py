@@ -37,11 +37,11 @@ class Auth:
         """Method to get the authorization header from the request"""
         if request is None:
             return None
-        
+
         # Check if the Authorization header is present
         if 'Authorization' not in request.headers:
             return None
-        
+
         # Return the value of the Authorization header
         return request.headers.get('Authorization')
 
