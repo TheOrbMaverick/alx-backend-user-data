@@ -27,7 +27,6 @@ class SessionAuth(Auth):
             return None
         return self.user_id_by_session_id.get(session_id)
 
-    
     def current_user(self, request=None) -> TypeVar('User'):
         """ Overloads Auth and retrieves the User instance for a request """
         session_id = self.session_cookie(request)
@@ -37,7 +36,6 @@ class SessionAuth(Auth):
         if user_id is None:
             return None
         return User.get(user_id)
-
 
     def destroy_session(self, request=None) -> bool:
         """Deletes the user session / logout"""
