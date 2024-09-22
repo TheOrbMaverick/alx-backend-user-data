@@ -90,7 +90,7 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     database = os.getenv("PERSONAL_DATA_DB_NAME")
 
     # Connect to the MySQL database
-    return mysql.connector.connect(
+    return mysql.connector.connection.MySQLConnection(
         user=username,
         password=password,
         host=host,
