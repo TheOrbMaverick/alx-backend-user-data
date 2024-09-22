@@ -5,7 +5,7 @@ filtered_logger module
 import re
 import logging
 from typing import List
-import os
+from os import environ
 import mysql.connector
 
 # PII_FIELDS constant
@@ -77,22 +77,19 @@ def get_logger() -> logging.Logger:
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
     """
-    Connects to a secure MySQL database using credentials from
-    environment variables.
+    Returns a MySQLConnection object for accessing Personal Data database
 
     Returns:
-        A MySQLConnection object to the database.
+        A MySQLConnection object using connection details from
+        environment variables
     """
-    # Retrieve database credentials from environment variables
-    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
-    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
-    host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
-    database = os.getenv("PERSONAL_DATA_DB_NAME")
+    username = environ.get("PERSONAL_DATA_DB_USERNAME", "root")
+    password = environ.get("PERSONAL_DATA_DB_PASSWORD", "")
+    host = environ.get("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = environ.get("PERSONAL_DATA_DB_NAME")
 
-    # Connect to the MySQL database
-    return mysql.connector.connection.MySQLConnection(
-        user=username,
-        password=password,
-        host=host,
-        database=database
-    )
+    cnx = mysql.connector.connection.MySQLConnection(user=username,
+                                                     password=password,
+                                                     host=host,
+                                                     database=db_name)
+    return cnx
