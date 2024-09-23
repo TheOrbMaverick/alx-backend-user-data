@@ -32,79 +32,46 @@ else:
     auth = Auth()
 
 
-# @app.before_request
-# def before_request() -> str:
-#     """ Method to filter each request """
-#     if auth is None:
-#         pass
-#     else:
-#         setattr(request, "current_user", auth.current_user(request))
-#         excluded_paths = ['/api/v1/status/',
-#                           '/api/v1/unauthorized/',
-#                           '/api/v1/forbidden/',
-#                           '/api/v1/auth_session/login/']
-
-#         if auth.require_auth(request.path, excluded_paths):
-#             sk = auth.session_cookie(request)
-#             if auth.authorization_header(request) is None and sk is None:
-#                 abort(401, description="Unauthorized")
-#             if auth.current_user(request) is None:
-#                 abort(403, description="Forbidden")
-
-
 @app.errorhandler(401)
 def unauthorized(error) -> str:
-    """
-    Unauthorized handler
-    """
-    return jsonify({"error": "Unauthorized"}), 401
+    """ Unauthorized handler """
+    return jsonify({
+        "error": "Unauthorized"
+        }), 401
 
 
 @app.errorhandler(403)
 def forbidden(error) -> str:
-    """
-    Forbidden handler
-    """
+    """ Forbidden handler """
     return jsonify({"error": "Forbidden"}), 403
 
 
 @app.errorhandler(404)
 def not_found(error) -> str:
-    """
-    Not found handler
-    """
+    """ Not found handler """
     return jsonify({"error": "Not found"}), 404
 
 
 @app.before_request
-def before_request():
-    """ Method to handle before_request filter """
+def before_request() -> str:
+    """ Method to filter each request """
     if auth is None:
         return
-
-    excluded_paths = [
-        '/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/'
-        ]
+    excluded_paths = ['/api/v1/status/',
+                      '/api/v1/unauthorized/',
+                      '/api/v1/forbidden/',
+                      '/api/v1/auth_session/login/']
     if not auth.require_auth(request.path, excluded_paths):
         return
-
-    if auth.authorization_header(request) is None:
-        abort(401)
-
-    if auth.current_user(request) is None:
+    if (auth.authorization_header(request) is None
+            and auth.session_cookie(request) is None):
         abort(403)
 
+    # Assign the current authenticated user to request.current_user
+    request.current_user = auth.current_user(request)
 
-@app.route('/api/v1/status/', methods=['GET'])
-def status():
-    """Returns the status of the API"""
-    return jsonify({"status": "OK"})
-
-
-if __name__ == "__main__":
-    host = getenv("API_HOST", "0.0.0.0")
-    port = getenv("API_PORT", "5000")
-    app.run(host=host, port=port)
+    if request.current_user is None:
+        abort(403)
 
 
 if __name__ == "__main__":
