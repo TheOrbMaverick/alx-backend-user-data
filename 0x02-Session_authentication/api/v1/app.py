@@ -36,7 +36,7 @@ else:
 def before_request() -> str:
     """ Method to filter each request """
     if auth is None:
-        return
+        pass
     else:
         setattr(request, "current_user", auth.current_user(request))
         excluded_paths = ['/api/v1/status/',
