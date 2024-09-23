@@ -7,7 +7,6 @@ from api.v1.auth.session_db_auth import SessionDBAuth
 from os import getenv
 
 
-@app_views.route('/api/v1/auth_session/login', methods=['POST'], strict_slashes=False)
 @app_views.route('/auth_session/login', methods=['POST'], strict_slashes=False)
 def login():
     """ POST /auth_session/login """
@@ -34,7 +33,6 @@ def login():
     return response
 
 
-@app_views.route('/api/v1/auth_session/logout', methods=['DELETE'], strict_slashes=False)
 @app_views.route('/auth_session/logout', methods=['DELETE'], strict_slashes=False)
 def logout():
     """ DELETE /auth_session/logout """
