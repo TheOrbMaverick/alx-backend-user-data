@@ -27,12 +27,27 @@ class SessionAuth(Auth):
         return self.user_id_by_session_id.get(session_id)
 
     def current_user(self, request=None):
-        """ Overloads Auth and retrieves the User instance for a request """
+        """Retrieve the User instance based on the session ID in the cookie"""
+
+        # Ensure the request object is provided
+        if request is None:
+            return None
+
+        # Get the session ID from the request cookies
         session_id = self.session_cookie(request)
+
+        # If no session ID is present in the cookies, return None
         if session_id is None:
             return None
+
+        # Get the user ID associated with the session ID
         user_id = self.user_id_for_session_id(session_id)
 
+        # If the session ID is not valid or has no associated user, return None
+        if user_id is None:
+            return None
+
+        # Use the user ID to retrieve the User instance from the database
         return User.get(user_id)
 
     def destroy_session(self, request=None) -> bool:
